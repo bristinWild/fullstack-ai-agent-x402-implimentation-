@@ -1,0 +1,49 @@
+{
+    "name": "@swiftment/pay-button",
+    "version": "1.0.0",
+    "description": "Solana payment button with spending limits for e-commerce",
+    "main": "dist/index.js",
+    "module": "dist/index.esm.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist",
+        "README.md"
+    ],
+    "scripts": {
+        "build": "rollup -c",
+        "prepublishOnly": "npm run build"
+    },
+    "keywords": [
+        "solana",
+        "payment",
+        "usdc",
+        "web3",
+        "crypto",
+        "buy-button"
+    ],
+    "author": "Swiftment",
+    "license": "MIT",
+    "peerDependencies": {
+        "react": "^18.0.0 || ^19.0.0",
+        "react-dom": "^18.0.0 || ^19.0.0",
+        "@solana/web3.js": "^1.0.0",
+        "@solana/wallet-adapter-react": "^0.15.0"
+    },
+    "devDependencies": {
+        "@rollup/plugin-commonjs": "^25.0.0",
+        "@rollup/plugin-node-resolve": "^15.0.0",
+        "@rollup/plugin-typescript": "^11.0.0",
+        "@types/react": "^18.0.0",
+        "rollup": "^4.0.0",
+        "rollup-plugin-peer-deps-external": "^2.2.4",
+        "typescript": "^5.0.0"
+    },
+    "dependencies": {
+        "@coral-xyz/anchor": "^0.32.1",
+        "@solana/spl-token": "^0.4.14"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yourusername/swiftment"
+    }
+}
