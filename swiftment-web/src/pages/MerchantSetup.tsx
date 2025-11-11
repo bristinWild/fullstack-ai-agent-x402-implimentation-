@@ -3,7 +3,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { connection, deriveMerchantTreasuryPda, deriveTreasuryPda, ataOfUSDC, USDC_MINT } from '../lib/solana';
 
-// Copy button component
+// Simple Copy Button Component (inline)
 const CopyButton: React.FC<{ text: string; label?: string }> = ({ text, label = 'Copy' }) => {
   const [copied, setCopied] = useState(false);
 
@@ -33,12 +33,8 @@ const CopyButton: React.FC<{ text: string; label?: string }> = ({ text, label = 
   );
 };
 
-// Code snippet component
-const CodeSnippet: React.FC<{ code: string; language?: string; title?: string }> = ({
-  code,
-  language = 'tsx',
-  title
-}) => {
+// Code Snippet Component (inline)
+const CodeSnippet: React.FC<{ code: string; title?: string }> = ({ code, title }) => {
   return (
     <div style={{ marginTop: '16px' }}>
       {title && (
@@ -68,7 +64,7 @@ const CodeSnippet: React.FC<{ code: string; language?: string; title?: string }>
   );
 };
 
-// Stats card component
+// Stats Card Component
 const StatCard: React.FC<{ label: string; value: string; icon?: string }> = ({ label, value, icon }) => {
   return (
     <div style={{
@@ -117,7 +113,7 @@ export default function MerchantSetup() {
       }
     };
     fetchBalance();
-    const interval = setInterval(fetchBalance, 10000); // Refresh every 10s
+    const interval = setInterval(fetchBalance, 10000);
     return () => clearInterval(interval);
   }, [treasuryAta]);
 
@@ -142,7 +138,7 @@ function ProductPage() {
   );
 }`;
 
-  const htmlScript = `<!-- Add this to your HTML -->
+  const htmlScript = `<!-- Add to your HTML -->
 <script src="https://unpkg.com/@swiftment/pay-button"></script>
 <div id="swiftment-pay"></div>
 
@@ -153,26 +149,6 @@ function ProductPage() {
     label: 'Buy Now'
   });
 </script>`;
-
-  const nextjsComponent = `// app/checkout/page.tsx
-'use client';
-
-import { SwiftmentPayButton } from '@swiftment/pay-button';
-import dynamic from 'next/dynamic';
-
-const PayButton = dynamic(
-  () => import('@swiftment/pay-button').then(m => m.SwiftmentPayButton),
-  { ssr: false }
-);
-
-export default function CheckoutPage() {
-  return (
-    <PayButton 
-      merchantAddress="${merchantAddress}"
-      amount={49.99}
-    />
-  );
-}`;
 
   if (!publicKey) {
     return (
@@ -192,7 +168,7 @@ export default function CheckoutPage() {
             Welcome to Swiftment Merchant Dashboard
           </h2>
           <p style={{ fontSize: '18px', color: '#64748b', marginBottom: '24px' }}>
-            Connect your wallet to get started with accepting payments
+            Connect your wallet to get started
           </p>
           <p style={{ fontSize: '14px', color: '#94a3b8' }}>
             ✨ No registration required • 🚀 Start accepting USDC in minutes
@@ -337,39 +313,20 @@ export default function CheckoutPage() {
           }}>
             <strong style={{ color: '#047857' }}>📚 Quick Start Guide</strong>
             <p style={{ margin: '8px 0 0 0', color: '#065f46' }}>
-              Choose your integration method below and start accepting payments in minutes!
+              Choose your integration method below and start accepting payments!
             </p>
           </div>
 
           <h3>1️⃣ Install Package</h3>
-          <CodeSnippet code={npmInstall} language="bash" title="NPM Install" />
+          <CodeSnippet code={npmInstall} title="NPM Install" />
 
           <h3 style={{ marginTop: '32px' }}>2️⃣ Choose Your Integration</h3>
 
           <h4 style={{ marginTop: '24px', color: '#6366f1' }}>React Component</h4>
           <CodeSnippet code={reactComponent} title="React/Vite/CRA" />
 
-          <h4 style={{ marginTop: '24px', color: '#6366f1' }}>Next.js App Router</h4>
-          <CodeSnippet code={nextjsComponent} title="Next.js 13+ (App Router)" />
-
           <h4 style={{ marginTop: '24px', color: '#6366f1' }}>Vanilla HTML/JS</h4>
-          <CodeSnippet code={htmlScript} language="html" title="HTML Script Tag" />
-
-          <div style={{
-            background: '#fef3c7',
-            border: '1px solid #f59e0b',
-            padding: '16px',
-            borderRadius: '8px',
-            marginTop: '24px'
-          }}>
-            <strong style={{ color: '#92400e' }}>⚡ Coming Soon:</strong>
-            <ul style={{ margin: '8px 0 0 0', paddingLeft: '20px', color: '#78350f' }}>
-              <li>WordPress Plugin</li>
-              <li>Shopify App</li>
-              <li>WooCommerce Extension</li>
-              <li>Webflow Widget</li>
-            </ul>
-          </div>
+          <CodeSnippet code={htmlScript} title="HTML Script Tag" />
         </div>
       )}
 
@@ -377,7 +334,7 @@ export default function CheckoutPage() {
         <div>
           <h3>🎨 Button Customization</h3>
           <p style={{ color: '#64748b' }}>
-            Customize the appearance of your payment button to match your brand
+            Customize the appearance to match your brand
           </p>
 
           <div style={{
@@ -386,7 +343,6 @@ export default function CheckoutPage() {
             gap: '24px',
             marginTop: '24px'
           }}>
-            {/* Theme examples */}
             <div style={{
               background: '#f8fafc',
               padding: '20px',
@@ -407,46 +363,19 @@ export default function CheckoutPage() {
               padding: '20px',
               borderRadius: '12px'
             }}>
-              <h4>Light Theme</h4>
+              <h4>Custom Styles</h4>
               <CodeSnippet
                 code={`<SwiftmentPayButton
   merchantAddress="${merchantAddress}"
   amount={29.99}
-  theme="light"
-/>`}
-              />
-            </div>
-
-            <div style={{
-              background: '#f8fafc',
-              padding: '20px',
-              borderRadius: '12px'
-            }}>
-              <h4>Dark Theme</h4>
-              <CodeSnippet
-                code={`<SwiftmentPayButton
-  merchantAddress="${merchantAddress}"
-  amount={29.99}
-  theme="dark"
+  style={{
+    background: '#your-color',
+    borderRadius: '8px'
+  }}
 />`}
               />
             </div>
           </div>
-
-          <h4 style={{ marginTop: '32px' }}>Custom Styles</h4>
-          <CodeSnippet
-            code={`<SwiftmentPayButton
-  merchantAddress="${merchantAddress}"
-  amount={29.99}
-  style={{
-    background: '#your-brand-color',
-    borderRadius: '8px',
-    padding: '16px 32px',
-    fontSize: '18px'
-  }}
-/>`}
-            title="Custom CSS Styles"
-          />
         </div>
       )}
     </div>
