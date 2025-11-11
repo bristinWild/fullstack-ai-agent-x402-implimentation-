@@ -1,18 +1,15 @@
-// swiftment-api/src/main.ts
-// Update this file to enable CORS for frontend
-
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Enable CORS to allow frontend to connect
+
   app.enableCors({
     origin: [
-      'http://localhost:5173', // Vite default
-      'http://localhost:3000', // Alternative
-      process.env.FRONTEND_URL // From .env
+      'http://localhost:5173',
+      'http://localhost:3000',
+      process.env.FRONTEND_URL
     ].filter(Boolean),
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

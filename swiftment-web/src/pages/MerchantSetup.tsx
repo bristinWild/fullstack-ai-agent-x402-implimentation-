@@ -235,7 +235,7 @@ function ProductPage() {
       {activeTab === 'overview' && (
         <div>
           <div style={{
-            background: '#f8fafc',
+            background: '#2a2d30ff',
             padding: '24px',
             borderRadius: '12px',
             marginBottom: '24px'
@@ -256,7 +256,8 @@ function ProductPage() {
                     background: 'white',
                     padding: '8px 12px',
                     borderRadius: '6px',
-                    flex: 1
+                    flex: 1,
+                    color: 'black',
                   }}>
                     {merchantAddress}
                   </code>
