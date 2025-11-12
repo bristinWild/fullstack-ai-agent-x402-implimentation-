@@ -1,153 +1,99 @@
-// swiftment-web/src/components/PayButton.tsx
-// Updated PayButton with backend verification
+
 
 import { useState } from "react";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { PublicKey, Transaction, SystemProgram } from "@solana/web3.js";
-import {
-  getAssociatedTokenAddressSync,
-  createAssociatedTokenAccountInstruction,
-  TOKEN_PROGRAM_ID,
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
-import { PROGRAM_ID, USDC_MINT } from "../lib/solana";
-import { verifyPayment } from "../lib/api";
 import * as anchor from "@coral-xyz/anchor";
-
-interface PayButtonProps {
-  merchantAuthority: string;
-  amountUsdc: number; // in USDC (e.g. 2.5 = $2.50)
-  label?: string;
-  onSuccess?: (signature: string) => void;
-  onError?: (error: Error) => void;
-}
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { sdk, getProgram } from "../swiftment";
 
 export function PayButton({
   merchantAuthority,
-  amountUsdc,
-  label = "Pay Now",
-  onSuccess,
-  onError,
-}: PayButtonProps) {
+  amountUsdc
+}: {
+  merchantAuthority: string;
+  amountUsdc: number;
+}) {
   const { connection } = useConnection();
-  const { publicKey, sendTransaction } = useWallet();
+  const wallet = useWallet(); // Get the full wallet object
+  const { publicKey } = wallet;
+
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<string>("");
+  const [error, setError] = useState<string>("");
 
-  async function handlePay() {
-    if (!publicKey) {
-      setStatus("Please connect your wallet first");
+  const onClick = async () => {
+    if (!publicKey || !wallet.signTransaction || !wallet.sendTransaction) {
+      setError("Please connect your wallet first");
       return;
     }
 
     setLoading(true);
     setStatus("Preparing transaction...");
+    setError("");
 
     try {
-      const merchant = new PublicKey(merchantAuthority);
-      const payer = publicKey;
-
-      // Convert USDC amount to lamports (6 decimals)
-      const amountLamports = Math.floor(amountUsdc * 1_000_000);
-
-      // Derive PDAs
-      const [merchantPda] = PublicKey.findProgramAddressSync(
-        [Buffer.from("merchant"), merchant.toBuffer()],
-        PROGRAM_ID
+      // Create a proper AnchorProvider with the wallet
+      const provider = new anchor.AnchorProvider(
+        connection,
+        wallet as any, // Pass the entire wallet object
+        {
+          commitment: 'confirmed',
+          preflightCommitment: 'confirmed'
+        }
       );
 
-      const [treasuryPda] = PublicKey.findProgramAddressSync(
-        [Buffer.from("treasury"), merchantPda.toBuffer()],
-        PROGRAM_ID
-      );
+      const program = getProgram(provider);
+      const api = sdk(program);
 
-      const [userPda] = PublicKey.findProgramAddressSync(
-        [Buffer.from("user"), payer.toBuffer()],
-        PROGRAM_ID
-      );
+      console.log("User:", publicKey.toString());
+      console.log("Merchant:", merchantAuthority);
+      console.log("Amount:", amountUsdc);
 
-      const [userPlatformPda] = PublicKey.findProgramAddressSync(
-        [Buffer.from("user_platform"), payer.toBuffer(), merchant.toBuffer()],
-        PROGRAM_ID
-      );
-
-      const [configPda] = PublicKey.findProgramAddressSync(
-        [Buffer.from("config")],
-        PROGRAM_ID
-      );
-
-      // Get token accounts
-      const payerUsdcAta = getAssociatedTokenAddressSync(USDC_MINT, payer);
-      const treasuryUsdcAta = getAssociatedTokenAddressSync(
-        USDC_MINT,
-        treasuryPda,
-        true
-      );
-
-      // Create transaction
-      const transaction = new Transaction();
-
-      // Check if payer's USDC ATA exists, create if not
+      // First ensure user is registered and opted in
+      setStatus("Registering user and opting in...");
       try {
-        await connection.getAccountInfo(payerUsdcAta);
-      } catch {
-        transaction.add(
-          createAssociatedTokenAccountInstruction(
-            payer,
-            payerUsdcAta,
-            payer,
-            USDC_MINT
-          )
+        await api.ensureUserAndOptIn(
+          publicKey,
+          new anchor.web3.PublicKey(merchantAuthority)
         );
+        console.log("User registered and opted in");
+      } catch (err) {
+        console.log("User might already be registered:", err);
+        // Continue anyway - they might already be registered
       }
 
-      // Create the payment instruction
-      // Note: You'll need to import your program IDL and create the instruction properly
-      // This is a simplified example - adjust based on your actual program interface
+      // Now make the payment
+      setStatus("Processing payment...");
+      const sig = await api.pay(
+        publicKey,
+        new anchor.web3.PublicKey(merchantAuthority),
+        amountUsdc
+      );
 
-      setStatus("Awaiting approval...");
+      setStatus(`✅ Payment successful! Signature: ${sig}`);
+      console.log("Payment signature:", sig);
 
-      // Send transaction
-      const signature = await sendTransaction(transaction, connection);
+      // Clear success message after 5 seconds
+      setTimeout(() => setStatus(""), 5000);
 
-      setStatus("Confirming transaction...");
-
-      // Wait for confirmation
-      await connection.confirmTransaction(signature, "confirmed");
-
-      setStatus("Verifying payment with backend...");
-
-      // Verify with backend
-      const verificationResult = await verifyPayment(signature, merchantAuthority);
-
-      if (verificationResult.ok) {
-        setStatus("✅ Payment successful!");
-        onSuccess?.(signature);
-      } else {
-        throw new Error(
-          verificationResult.reason || "Payment verification failed"
-        );
-      }
-    } catch (error) {
-      console.error("Payment error:", error);
-      const errorMessage =
-        error instanceof Error ? error.message : "Payment failed";
-      setStatus(`❌ ${errorMessage}`);
-      onError?.(error instanceof Error ? error : new Error(errorMessage));
+    } catch (err: any) {
+      console.error("Payment error:", err);
+      const errorMessage = err?.message || err?.toString() || "Payment failed";
+      setError(`❌ Error: ${errorMessage}`);
+      setStatus("");
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
     <div style={{ marginTop: 16 }}>
       <button
-        onClick={handlePay}
+        onClick={onClick}
         disabled={!publicKey || loading}
         style={{
           padding: "12px 24px",
           fontSize: 16,
-          background: loading ? "#ccc" : "#6366f1",
+          background: loading ? "#ccc" : !publicKey ? "#666" : "#6366f1",
           color: "white",
           border: "none",
           borderRadius: 8,
@@ -155,16 +101,37 @@ export function PayButton({
           fontWeight: 600,
         }}
       >
-        {loading ? "Processing..." : `${label} ($${amountUsdc.toFixed(2)})`}
+        {loading ? "Processing..." : `Pay ${amountUsdc} USDC`}
       </button>
+
       {status && (
-        <p
-          style={{
-            marginTop: 8,
-            color: status.startsWith("✅") ? "green" : status.startsWith("❌") ? "red" : "#666",
-          }}
-        >
+        <p style={{
+          marginTop: 8,
+          color: status.startsWith("✅") ? "green" : "#666",
+          fontSize: 14
+        }}>
           {status}
+        </p>
+      )}
+
+      {error && (
+        <p style={{
+          marginTop: 8,
+          color: "red",
+          fontSize: 14
+        }}>
+          {error}
+        </p>
+      )}
+
+      {!publicKey && (
+        <p style={{
+          marginTop: 8,
+          color: "#666",
+          fontSize: 14,
+          fontStyle: "italic"
+        }}>
+          Connect your wallet to make a payment
         </p>
       )}
     </div>

@@ -269,7 +269,8 @@ function ProductPage() {
                 <div style={{
                   fontFamily: 'Monaco, monospace',
                   fontSize: '13px',
-                  marginTop: '4px'
+                  marginTop: '4px',
+                  color: 'black',
                 }}>
                   <code style={{
                     background: 'white',
@@ -286,7 +287,8 @@ function ProductPage() {
                 <div style={{
                   fontFamily: 'Monaco, monospace',
                   fontSize: '13px',
-                  marginTop: '4px'
+                  marginTop: '4px',
+                  color: 'black',
                 }}>
                   <code style={{
                     background: 'white',

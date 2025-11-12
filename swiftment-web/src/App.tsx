@@ -10,6 +10,7 @@ import MerchantSetup from "./pages/MerchantSetup";
 import UserDashboard from "./pages/UserDashboard";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 
+
 const RPC = import.meta.env.VITE_RPC as string;
 const MERCHANT_AUTH = import.meta.env.VITE_MERCHANT_AUTH as string;
 
