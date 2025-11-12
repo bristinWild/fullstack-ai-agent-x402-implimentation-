@@ -33,11 +33,11 @@ export class PaymentsService implements OnModuleInit {
       if (process.env.PROGRAM_ID) {
         this.programId = new PublicKey(process.env.PROGRAM_ID);
       }
-      
+
       if (process.env.USDC_MINT) {
         this.usdcMint = new PublicKey(process.env.USDC_MINT);
       }
-      
+
       if (process.env.RPC_URL) {
         this.connection = new Connection(process.env.RPC_URL, 'confirmed');
       }
@@ -55,9 +55,6 @@ export class PaymentsService implements OnModuleInit {
   }
 
 
-  /**
-   * PDA helpers — keep seeds consistent with your program.
-   */
   private deriveMerchantTreasuryPda(merchant: PublicKey): PublicKey {
     const [pda] = PublicKey.findProgramAddressSync(
       [Buffer.from('merchant_treasury'), merchant.toBuffer()],
