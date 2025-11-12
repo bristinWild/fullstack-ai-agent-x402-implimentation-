@@ -11,7 +11,7 @@ import {
     Res,
     Logger,
 } from '@nestjs/common';
-import { Response } from 'express';
+import type { Response } from 'express';
 import { X402Service, X402PaymentInfo } from './x402.service';
 import { PaymentsService } from '../payments/payments.service';
 
@@ -140,11 +140,12 @@ export class X402Controller {
             const purchaseResult = await this.paymentsService.processPurchase({
                 merchantId: dto.merchantId,
                 amount: dto.amount,
-                signature: validation.signature!,
+                productId: dto.productId,
                 metadata: {
                     ...dto.metadata,
                     x402: true,
                     agentId,
+                    signature: validation.signature,
                 },
             });
 

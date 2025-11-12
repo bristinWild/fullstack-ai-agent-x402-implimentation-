@@ -5,6 +5,7 @@ import { UsersModule } from './users/users.module';
 import { LimitsModule } from './limits/limits.module';
 import { PurchasesModule } from './purchases/purchases.module';
 import { SolanaModule } from './solana/solana.module';
+import { X402Module } from './x402/x402.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { SolanaModule } from './solana/solana.module';
     LimitsModule,
     PurchasesModule,
     PaymentsModule,
+    X402Module,
   ],
 })
 export class AppModule {}

@@ -248,8 +248,10 @@ export class X402Service {
 
 
     async getMerchantPaymentAddress(merchantId: string): Promise<string> {
-
-        return this.configService.get<string>('EhxuCNAjpQSExjYByDJWNtqR8QyqekiDZfXHTbYdy1PF') || '';
+        // For development, return a default merchant address
+        // In production, you would look this up from a database or configuration
+        return this.configService.get<string>('MERCHANT_PAYMENT_ADDRESS') || 
+               'EhxuCNAjpQSExjYByDJWNtqR8QyqekiDZfXHTbYdy1PF';
     }
 
     /**

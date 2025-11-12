@@ -1,35 +1,22 @@
-import { useMemo } from "react";
-import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
-import { ConnectionProvider, WalletProvider } from "@solana/wallet-adapter-react";
-import { WalletModalProvider, WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { PhantomWalletAdapter, SolflareWalletAdapter } from "@solana/wallet-adapter-wallets";
-import "@solana/wallet-adapter-react-ui/styles.css";
-
-import { PayButton } from "./components/PayButton";
-import MerchantSetup from "./pages/MerchantSetup";
-import UserDashboard from "./pages/UserDashboard";
-import { ErrorBoundary } from "./components/ErrorBoundary";
-
-
-const RPC = import.meta.env.VITE_RPC as string;
-const MERCHANT_AUTH = import.meta.env.VITE_MERCHANT_AUTH as string;
-
-function isPubkey(s: string | undefined): boolean {
-  if (!s) return false;
-  return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(s);
-}
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { WalletModalProvider, WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { WalletContextProvider } from './contexts/WalletContext';
+import { PaymentButton } from './components/PaymentButton';
+import '@solana/wallet-adapter-react-ui/styles.css';
 
 function Home() {
-  const rpc = import.meta.env.VITE_RPC as string | undefined;
   const merchantAuth = import.meta.env.VITE_MERCHANT_AUTH as string | undefined;
-
+  
   return (
     <div style={{
       minHeight: '100vh',
       width: '100vw',
       background: 'linear-gradient(to bottom, #f8fafc, #e2e8f0)',
       padding: '60px 5vw',
-      boxSizing: 'border-box'
+      boxSizing: 'border-box',
+      margin: 0, // Ensure no default margins
+      overflowX: 'hidden' // Prevent horizontal scroll
     }}>
       {/* Hero Section */}
       <div style={{ marginBottom: '40px', textAlign: 'center' }}>
@@ -53,7 +40,7 @@ function Home() {
         </p>
       </div>
 
-      {/* Features Grid - FULL WIDTH */}
+      {/* Features Grid */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
@@ -84,7 +71,7 @@ function Home() {
         ))}
       </div>
 
-      {/* Demo Section - Centered */}
+      {/* Payment Demo Section */}
       <div style={{
         background: 'white',
         padding: '48px',
@@ -100,177 +87,75 @@ function Home() {
           Test payment on Solana Devnet
         </p>
 
-        {!rpc && <p style={{ color: 'tomato', textAlign: 'center' }}>Set <code>VITE_RPC</code> in your .env</p>}
-        {!isPubkey(merchantAuth) ? (
-          <p style={{ color: 'tomato', textAlign: 'center' }}>
-            Set a valid <code>VITE_MERCHANT_AUTH</code> in your .env
+        <div style={{
+          background: '#f8fafc',
+          padding: '24px',
+          borderRadius: '12px',
+          marginBottom: '24px'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <span style={{ fontWeight: '500' }}>Demo Product</span>
+            <span style={{ fontWeight: '700', fontSize: '20px' }}>2.5 USDC</span>
+          </div>
+          <p style={{ color: '#64748b', margin: 0, fontSize: '14px', textAlign: 'left' }}>
+            Test payment on devnet
           </p>
-        ) : (
-          <div>
-            <div style={{
-              background: '#f8fafc',
-              padding: '24px',
-              borderRadius: '12px',
-              marginBottom: '24px'
-            }}>
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                marginBottom: '8px'
-              }}>
-                <span style={{ fontWeight: '500' }}>Demo Product</span>
-                <span style={{ fontWeight: '700', fontSize: '20px' }}>2.5 USDC</span>
-              </div>
-              <p style={{
-                color: '#64748b',
-                margin: 0,
-                fontSize: '14px',
-                textAlign: 'left'
-              }}>
-                Test payment on devnet
-              </p>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <PayButton merchantAuthority={merchantAuth!} amountUsdc={2.5} />
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* CTA Section - FULL WIDTH */}
-      <div style={{
-        padding: '48px',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        borderRadius: '24px',
-        color: 'white',
-        textAlign: 'center',
-        marginBottom: '60px'
-      }}>
-        <h2 style={{ fontSize: 'clamp(28px, 4vw, 36px)', marginBottom: '16px' }}>
-          Ready to Accept Payments?
-        </h2>
-        <p style={{ fontSize: '18px', marginBottom: '32px', opacity: 0.9 }}>
-          Start accepting USDC payments in less than 5 minutes
-        </p>
-        <Link to="/merchant" style={{ textDecoration: 'none' }}>
-          <button style={{
-            background: 'white',
-            color: '#6366f1',
-            padding: '14px 32px',
-            borderRadius: '12px',
-            border: 'none',
-            fontSize: '16px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            transition: 'transform 0.2s'
-          }}>
-            Become a Merchant
-          </button>
-        </Link>
-      </div>
-
-      {/* Stats - FULL WIDTH */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-        gap: '24px',
-        width: '100%'
-      }}>
-        {[
-          { label: 'Transaction Time', value: '<1s' },
-          { label: 'Network Fee', value: '$0.00025' },
-          { label: 'Platform Fee', value: '0%' },
-          { label: 'Network', value: 'Solana' }
-        ].map(stat => (
-          <div key={stat.label} style={{ textAlign: 'center' }}>
-            <div style={{
-              fontSize: '32px',
-              fontWeight: 'bold',
-              color: '#6366f1',
-              marginBottom: '8px'
-            }}>
-              {stat.value}
-            </div>
-            <div style={{ color: '#64748b', fontSize: '14px' }}>
-              {stat.label}
-            </div>
-          </div>
-        ))}
+        </div>
+        
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          {merchantAuth ? (
+            <PaymentButton 
+              merchantId={merchantAuth}
+              amount={2.5}
+              productId="demo_product"
+              onSuccess={() => alert('Payment successful!')}
+              onError={(error) => alert(`Payment failed: ${error.message}`)}
+              className="px-6 py-3"
+            />
+          ) : (
+            <p style={{ color: 'red' }}>Please set VITE_MERCHANT_AUTH in your .env file</p>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
-export default function App() {
-  const wallets = useMemo(() => [new PhantomWalletAdapter(), new SolflareWalletAdapter()], []);
-
+function App() {
   return (
-    <ConnectionProvider endpoint={RPC}>
-      <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>
-          <ErrorBoundary>
-            <BrowserRouter>
-              {/* REMOVE ALL PADDING/MARGIN - TRUE FULL WIDTH */}
-              <div style={{
-                width: '100vw',
-                minHeight: '100vh',
-                margin: 0,
-                padding: 0,
-                overflow: 'hidden'
+    <WalletContextProvider>
+      <WalletModalProvider>
+        <Router>
+          <div style={{ position: 'relative', minHeight: '100vh' }}>
+            <header style={{ 
+              backgroundColor: '#1e293b', 
+              padding: '1rem 5vw',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              position: 'sticky',
+              top: 0,
+              zIndex: 1000
+            }}>
+              <Link to="/" style={{ 
+                color: 'white', 
+                textDecoration: 'none',
+                fontSize: '1.25rem',
+                fontWeight: '600'
               }}>
-                {/* Header - FULL WIDTH */}
-                <div style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: '16px 5vw',
-                  background: '#1e293b',
-                  width: '100vw',
-                  boxSizing: 'border-box'
-                }}>
-                  <nav style={{ display: "flex", gap: '24px' }}>
-                    <Link to="/" style={{
-                      color: 'white',
-                      textDecoration: 'none',
-                      fontSize: '16px',
-                      fontWeight: '500'
-                    }}>
-                      Home
-                    </Link>
-                    <Link to="/merchant" style={{
-                      color: 'white',
-                      textDecoration: 'none',
-                      fontSize: '16px',
-                      fontWeight: '500'
-                    }}>
-                      Merchant Setup
-                    </Link>
-                    <Link to="/dashboard" style={{
-                      color: 'white',
-                      textDecoration: 'none',
-                      fontSize: '16px',
-                      fontWeight: '500'
-                    }}>
-                      User Dashboard
-                    </Link>
-                  </nav>
-                  <WalletMultiButton />
-                </div>
-
-                {/* Routes Container - FULL WIDTH */}
-                <div style={{ width: '100vw', boxSizing: 'border-box' }}>
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/merchant" element={<MerchantSetup />} />
-                    <Route path="/dashboard" element={<UserDashboard />} />
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                  </Routes>
-                </div>
-              </div>
-            </BrowserRouter>
-          </ErrorBoundary>
-        </WalletModalProvider>
-      </WalletProvider>
-    </ConnectionProvider>
+                Swiftment
+              </Link>
+              <WalletMultiButton />
+            </header>
+            
+            <Routes>
+              <Route path="/" element={<Home />} />
+            </Routes>
+          </div>
+        </Router>
+      </WalletModalProvider>
+    </WalletContextProvider>
   );
 }
+
+export default App;

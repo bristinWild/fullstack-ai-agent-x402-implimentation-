@@ -54,6 +54,74 @@ export class PaymentsService implements OnModuleInit {
     }
   }
 
+  /**
+   * Process a purchase after payment verification
+   * @param purchaseData Purchase data including merchant, amount, and product info
+   * @returns Purchase result with success status and transaction details
+   */
+  async processPurchase(purchaseData: {
+    merchantId: string;
+    amount: number;
+    productId?: string;
+    userId?: string;
+    metadata?: any;
+  }) {
+    try {
+      // Verify the payment was made (this would be verified by the X402 service first)
+      // Here we assume the payment is already verified and we're just processing the purchase
+      
+      // Create a purchase record in your database
+      // This is a placeholder - replace with your actual purchase creation logic
+      const purchase = {
+        id: `purchase_${Date.now()}`,
+        merchantId: purchaseData.merchantId,
+        userId: purchaseData.userId || 'anonymous',
+        productId: purchaseData.productId || 'default',
+        amount: purchaseData.amount,
+        status: 'completed',
+        metadata: purchaseData.metadata || {},
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      // Here you would typically save the purchase to your database
+      // await this.purchaseRepository.save(purchase);
+
+      // Fulfill the purchase (e.g., grant access, deliver product, etc.)
+      // This is where you'd implement your specific business logic
+      await this.fulfillPurchase(purchase);
+
+      return {
+        success: true,
+        purchaseId: purchase.id,
+        message: 'Purchase processed successfully',
+        data: purchase,
+      };
+    } catch (error) {
+      console.error('Error processing purchase:', error);
+      throw new Error(`Failed to process purchase: ${error.message}`);
+    }
+  }
+
+  /**
+   * Fulfill a purchase (e.g., grant access, deliver product, etc.)
+   * @param purchase The purchase to fulfill
+   */
+  private async fulfillPurchase(purchase: any) {
+    // Implement your specific fulfillment logic here
+    // For example:
+    // - Grant access to a course or content
+    // - Send a confirmation email
+    // - Update inventory
+    // - Trigger shipping
+    
+    // This is a placeholder implementation
+    console.log(`Fulfilling purchase ${purchase.id} for product ${purchase.productId}`);
+    
+    // Simulate async operation
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
+
 
   private deriveMerchantTreasuryPda(merchant: PublicKey): PublicKey {
     const [pda] = PublicKey.findProgramAddressSync(
