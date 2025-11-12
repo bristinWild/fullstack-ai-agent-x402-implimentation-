@@ -1,49 +1,60 @@
 {
     "name": "@swiftment/pay-button",
-    "version": "1.0.0",
-    "description": "Solana payment button with spending limits for e-commerce",
-    "main": "dist/index.js",
-    "module": "dist/index.esm.js",
-    "types": "dist/index.d.ts",
+    "version": "1.0.2",
+    "description": "A React component and a easy to use tool for businesses to fascilitate Solana payments that utilise x402 over any platform.",
+    "main": "./dist/index.js",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./dist/index.mjs",
+            "require": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        }
+    },
     "files": [
         "dist",
-        "README.md"
+        "README.md",
+        "LICENSE"
     ],
     "scripts": {
-        "build": "rollup -c",
+        "build": "tsup src/index.ts --format cjs,esm --dts",
+        "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
         "prepublishOnly": "npm run build"
     },
     "keywords": [
         "solana",
         "payment",
-        "usdc",
+        "react",
         "web3",
         "crypto",
-        "buy-button"
+        "swiftment",
+        "usdc",
+        "wallet",
+        "blockchain"
     ],
-    "author": "Swiftment",
+    "author": "Swiftment Team",
     "license": "MIT",
-    "peerDependencies": {
-        "react": "^18.0.0 || ^19.0.0",
-        "react-dom": "^18.0.0 || ^19.0.0",
-        "@solana/web3.js": "^1.0.0",
-        "@solana/wallet-adapter-react": "^0.15.0"
-    },
-    "devDependencies": {
-        "@rollup/plugin-commonjs": "^25.0.0",
-        "@rollup/plugin-node-resolve": "^15.0.0",
-        "@rollup/plugin-typescript": "^11.0.0",
-        "@types/react": "^18.0.0",
-        "rollup": "^4.0.0",
-        "rollup-plugin-peer-deps-external": "^2.2.4",
-        "typescript": "^5.0.0"
-    },
-    "dependencies": {
-        "@coral-xyz/anchor": "^0.32.1",
-        "@solana/spl-token": "^0.4.14"
-    },
     "repository": {
         "type": "git",
-        "url": "https://github.com/yourusername/swiftment"
+        "url": "https://github.com/bristinWild/fullstack-ai-agent-x402-implimentation-/tree/main/swiftment-button"
+    },
+    "bugs": {
+        "url": "https://github.com/bristinWild/fullstack-ai-agent-x402-implimentation-/issues"
+    },
+    "homepage": "https://github.com/bristinWild/fullstack-ai-agent-x402-implimentation-/tree/main/swiftment-button",
+    "peerDependencies": {
+        "react": ">=17.0.0",
+        "react-dom": ">=17.0.0",
+        "@solana/wallet-adapter-react": "^0.15.0",
+        "@solana/web3.js": "^1.98.0",
+        "@coral-xyz/anchor": "^0.32.0"
+    },
+    "devDependencies": {
+        "@types/node": "^20.0.0",
+        "@types/react": "^18.0.0",
+        "@types/react-dom": "^18.0.0",
+        "tsup": "^8.0.0",
+        "typescript": "^5.0.0"
     }
 }

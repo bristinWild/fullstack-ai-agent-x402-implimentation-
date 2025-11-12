@@ -1,302 +1,56 @@
-# Swiftment Pay Button - NPM Package Setup & Publishing Guide
-
-## Overview
-This guide will help you create and publish `@swiftment/pay-button` as an npm package that users can install and use in their React applications.
-
-## Project Structure
-
-```
-swiftment-button/
-├── src/
-│   ├── components/
-│   │   └── PayButton.tsx
-│   ├── index.ts
-│   └── types.ts
-├── package.json
-├── tsconfig.json
-├── .npmignore
-├── README.md
-└── LICENSE
-```
-
-## Step-by-Step Setup
-
-### 1. Create the Project Directory
-
-```bash
-mkdir swiftment-button
-cd swiftment-button
-npm init -y
-```
-
-### 2. Install Dependencies
-
-```bash
-# Install peer dependencies (users will need these)
-npm install --save-peer-dependencies \
-  react \
-  react-dom \
-  @solana/wallet-adapter-react \
-  @solana/web3.js \
-  @coral-xyz/anchor
-
-# Install dev dependencies
-npm install --save-dev \
-  typescript \
-  @types/react \
-  @types/react-dom \
-  @types/node \
-  tsup
-```
-
-### 3. Configure package.json
-
-Update your `package.json` with the following configuration:
-
-```json
-{
-  "name": "@swiftment/pay-button",
-  "version": "1.0.0",
-  "description": "A React component for Solana payments using Swiftment protocol",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
-  },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
-  "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts",
-    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
-    "prepublishOnly": "npm run build"
-  },
-  "keywords": [
-    "solana",
-    "payment",
-    "react",
-    "web3",
-    "crypto",
-    "swiftment"
-  ],
-  "author": "Your Name",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/yourusername/swiftment-button.git"
-  },
-  "peerDependencies": {
-    "react": ">=17.0.0",
-    "react-dom": ">=17.0.0",
-    "@solana/wallet-adapter-react": "^0.15.0",
-    "@solana/web3.js": "^1.98.0",
-    "@coral-xyz/anchor": "^0.32.0"
-  },
-  "devDependencies": {
-    "@types/node": "^20.0.0",
-    "@types/react": "^18.0.0",
-    "@types/react-dom": "^18.0.0",
-    "tsup": "^8.0.0",
-    "typescript": "^5.0.0"
-  }
-}
-```
-
-### 4. Create tsconfig.json
-
-```json
-{
-  "compilerOptions": {
-    "target": "ES2020",
-    "module": "ESNext",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "jsx": "react",
-    "declaration": true,
-    "declarationMap": true,
-    "outDir": "./dist",
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true
-  },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
-}
-```
-
-### 5. Create .npmignore
-
-```
-# Source files
-src/
-tsconfig.json
-
-# Development files
-*.log
-.DS_Store
-node_modules/
-.vscode/
-.idea/
-
-# Test files
-*.test.ts
-*.test.tsx
-__tests__/
-```
-
-### 6. Source Files
-
-#### src/types.ts
-```typescript
-export interface SwiftmentPayButtonProps {
-  merchantAuthority: string;
-  amountUsdc: number;
-  onSuccess?: (signature: string) => void;
-  onError?: (error: Error) => void;
-  buttonText?: string;
-  buttonStyle?: React.CSSProperties;
-  disabled?: boolean;
-}
-```
-
-#### src/components/PayButton.tsx
-```typescript
-import React, { useState } from 'react';
-import * as anchor from "@coral-xyz/anchor";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { SwiftmentPayButtonProps } from '../types';
-
-// You'll need to export these from your SDK
-import { sdk, getProgram } from "../swiftment";
-
-export function SwiftmentPayButton({
-  merchantAuthority,
-  amountUsdc,
-  onSuccess,
-  onError,
-  buttonText = `Pay ${amountUsdc} USDC`,
-  buttonStyle,
-  disabled = false,
-}: SwiftmentPayButtonProps) {
-  const { connection } = useConnection();
-  const { publicKey, signTransaction } = useWallet();
-  const [loading, setLoading] = useState(false);
-
-  const handleClick = async () => {
-    if (!publicKey || !signTransaction) {
-      const error = new Error('Wallet not connected');
-      onError?.(error);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      
-      const provider = new anchor.AnchorProvider(
-        connection,
-        { publicKey, signTransaction } as any,
-        {}
-      );
-      const program = getProgram(provider);
-      const api = sdk(program);
-
-      await api.ensureUserAndOptIn(
-        publicKey,
-        new anchor.web3.PublicKey(merchantAuthority)
-      );
-      
-      const signature = await api.pay(
-        publicKey,
-        new anchor.web3.PublicKey(merchantAuthority),
-        amountUsdc
-      );
-
-      onSuccess?.(signature);
-    } catch (error) {
-      console.error('Payment error:', error);
-      onError?.(error as Error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const defaultStyle: React.CSSProperties = {
-    padding: '12px 24px',
-    borderRadius: '12px',
-    border: 'none',
-    backgroundColor: '#512da8',
-    color: 'white',
-    fontSize: '16px',
-    fontWeight: '600',
-    cursor: disabled || loading ? 'not-allowed' : 'pointer',
-    opacity: disabled || loading ? 0.6 : 1,
-    transition: 'all 0.2s',
-    ...buttonStyle,
-  };
-
-  return (
-    <button
-      onClick={handleClick}
-      style={defaultStyle}
-      disabled={disabled || loading || !publicKey}
-    >
-      {loading ? 'Processing...' : buttonText}
-    </button>
-  );
-}
-```
-
-#### src/index.ts
-```typescript
-export { SwiftmentPayButton } from './components/PayButton';
-export type { SwiftmentPayButtonProps } from './types';
-```
-
-### 7. Create README.md
-
-```markdown
 # @swiftment/pay-button
 
-A React component for integrating Solana payments using the Swiftment protocol.
+A React component for integrating Solana payments using the Swiftment protocol. This button makes it easy to accept USDC payments on Solana with just a few lines of code.
 
-## Installation
+## 🚀 Installation
 
 ```bash
 npm install @swiftment/pay-button @solana/wallet-adapter-react @solana/web3.js @coral-xyz/anchor
 ```
 
-## Usage
+or with yarn:
+
+```bash
+yarn add @swiftment/pay-button @solana/wallet-adapter-react @solana/web3.js @coral-xyz/anchor
+```
+
+## 📋 Prerequisites
+
+Your React application must be wrapped with Solana wallet adapter providers. Install the following packages:
+
+```bash
+npm install @solana/wallet-adapter-react @solana/wallet-adapter-react-ui @solana/wallet-adapter-wallets
+```
+
+## 🎯 Basic Usage
 
 ```tsx
+import React from 'react';
 import { SwiftmentPayButton } from '@swiftment/pay-button';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
+import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
+
+// Import wallet adapter CSS
+import '@solana/wallet-adapter-react-ui/styles.css';
 
 function App() {
+  const wallets = [new PhantomWalletAdapter()];
+  
   return (
     <ConnectionProvider endpoint="https://api.devnet.solana.com">
-      <WalletProvider wallets={[]}>
+      <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
           <SwiftmentPayButton
             merchantAuthority="YOUR_MERCHANT_PUBLIC_KEY"
             amountUsdc={10}
             onSuccess={(signature) => {
               console.log('Payment successful!', signature);
+              alert(`Payment successful! Signature: ${signature}`);
             }}
             onError={(error) => {
               console.error('Payment failed:', error);
+              alert(`Payment failed: ${error.message}`);
             }}
           />
         </WalletModalProvider>
@@ -304,121 +58,232 @@ function App() {
     </ConnectionProvider>
   );
 }
+
+export default App;
 ```
 
-## Props
+## 🎨 Advanced Usage
 
-| Prop | Type | Required | Description |
-|------|------|----------|-------------|
-| `merchantAuthority` | `string` | Yes | The merchant's Solana public key |
-| `amountUsdc` | `number` | Yes | Amount in USDC to pay |
-| `onSuccess` | `(signature: string) => void` | No | Callback when payment succeeds |
-| `onError` | `(error: Error) => void` | No | Callback when payment fails |
-| `buttonText` | `string` | No | Custom button text |
-| `buttonStyle` | `React.CSSProperties` | No | Custom button styles |
-| `disabled` | `boolean` | No | Disable the button |
+### Custom Styling
 
-## Requirements
-
-Your app must be wrapped with Solana wallet adapter providers:
-- `ConnectionProvider`
-- `WalletProvider`
-- `WalletModalProvider` (recommended)
-
-## License
-
-MIT
+```tsx
+<SwiftmentPayButton
+  merchantAuthority="YOUR_MERCHANT_PUBLIC_KEY"
+  amountUsdc={25}
+  buttonText="Buy Premium Plan"
+  buttonStyle={{
+    backgroundColor: '#ff6b6b',
+    borderRadius: '8px',
+    padding: '16px 32px',
+    fontSize: '18px',
+    fontWeight: 'bold',
+  }}
+  className="custom-pay-button"
+/>
 ```
 
-### 8. Create LICENSE
+### With Error Handling
 
+```tsx
+function PaymentComponent() {
+  const [paymentStatus, setPaymentStatus] = useState('idle');
+
+  return (
+    <div>
+      <SwiftmentPayButton
+        merchantAuthority="YOUR_MERCHANT_PUBLIC_KEY"
+        amountUsdc={100}
+        onSuccess={(signature) => {
+          setPaymentStatus('success');
+          // Verify payment on your backend
+          fetch('/api/verify-payment', {
+            method: 'POST',
+            body: JSON.stringify({ signature }),
+          });
+        }}
+        onError={(error) => {
+          setPaymentStatus('error');
+          // Log error to your error tracking service
+          console.error('Payment error:', error);
+        }}
+      />
+      {paymentStatus === 'success' && <p>✅ Payment successful!</p>}
+      {paymentStatus === 'error' && <p>❌ Payment failed. Please try again.</p>}
+    </div>
+  );
+}
 ```
-MIT License
 
-Copyright (c) 2025 [Your Name]
+## 📖 API Reference
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+### Props
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+| Prop | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| `merchantAuthority` | `string` | ✅ Yes | - | The merchant's Solana public key (base58 encoded) |
+| `amountUsdc` | `number` | ✅ Yes | - | Amount to pay in USDC |
+| `onSuccess` | `(signature: string) => void` | No | - | Callback when payment succeeds |
+| `onError` | `(error: Error) => void` | No | - | Callback when payment fails |
+| `buttonText` | `string` | No | `"Pay {amount} USDC"` | Custom button text |
+| `buttonStyle` | `React.CSSProperties` | No | - | Custom inline styles |
+| `className` | `string` | No | `''` | Custom CSS class name |
+| `disabled` | `boolean` | No | `false` | Disable the button |
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+## 🔧 Setup Requirements
+
+### 1. Wallet Adapter Setup
+
+Your app must include Solana wallet adapter providers:
+
+```tsx
+import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
+import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
+
+const wallets = [
+  new PhantomWalletAdapter(),
+  new SolflareWalletAdapter(),
+];
+
+function App() {
+  return (
+    <ConnectionProvider endpoint={YOUR_RPC_ENDPOINT}>
+      <WalletProvider wallets={wallets} autoConnect>
+        <WalletModalProvider>
+          {/* Your app content */}
+        </WalletModalProvider>
+      </WalletProvider>
+    </ConnectionProvider>
+  );
+}
 ```
 
-## Publishing to NPM
+### 2. RPC Endpoints
 
-### 1. Create an NPM Account
+For production, use a reliable RPC endpoint:
+
+- **Devnet**: `https://api.devnet.solana.com`
+- **Mainnet**: Use services like [Helius](https://helius.dev), [QuickNode](https://quicknode.com), or [Alchemy](https://alchemy.com)
+
+## 🌐 Network Configuration
+
+```tsx
+// For Devnet (testing)
+<ConnectionProvider endpoint="https://api.devnet.solana.com">
+
+// For Mainnet (production)
+<ConnectionProvider endpoint="YOUR_MAINNET_RPC_URL">
+```
+
+## 💡 Example Projects
+
+### E-commerce Checkout
+
+```tsx
+function CheckoutButton({ orderId, total }) {
+  return (
+    <SwiftmentPayButton
+      merchantAuthority="YOUR_MERCHANT_KEY"
+      amountUsdc={total}
+      buttonText={`Pay $${total} USDC`}
+      onSuccess={async (signature) => {
+        // Update order status
+        await fetch('/api/orders/confirm', {
+          method: 'POST',
+          body: JSON.stringify({ orderId, signature }),
+        });
+      }}
+    />
+  );
+}
+```
+
+### Subscription Payment
+
+```tsx
+function SubscribeButton({ plan }) {
+  return (
+    <SwiftmentPayButton
+      merchantAuthority="YOUR_MERCHANT_KEY"
+      amountUsdc={plan.price}
+      buttonText={`Subscribe to ${plan.name}`}
+      onSuccess={(signature) => {
+        // Activate subscription
+        activateSubscription(plan.id, signature);
+      }}
+    />
+  );
+}
+```
+
+## 🛠️ Development
+
+To contribute or modify this package:
+
 ```bash
-npm login
-```
+# Clone the repository
+git clone https://github.com/yourusername/swiftment-button.git
+cd swiftment-button
 
-### 2. Build Your Package
-```bash
+# Install dependencies
+npm install
+
+# Build the package
 npm run build
+
+# Watch mode for development
+npm run dev
 ```
 
-### 3. Test Locally Before Publishing
+## 📝 Testing Locally
+
+Before publishing, test your package locally:
+
 ```bash
-# In your swiftment-button directory
+# In the swiftment-button directory
 npm link
 
-# In another project where you want to test
+# In your test project
 npm link @swiftment/pay-button
 ```
 
-### 4. Publish to NPM
-```bash
-# For first time publishing
-npm publish --access public
+## 🐛 Troubleshooting
 
-# For updates
-npm version patch  # or minor, or major
-npm publish
+### Wallet Not Connected Error
+
+Make sure your app is wrapped with `WalletProvider` and the user has connected their wallet.
+
+### Transaction Failed
+
+- Check that the merchant authority is correct
+- Ensure the user has sufficient USDC balance
+- Verify you're using the correct network (devnet/mainnet)
+
+### TypeScript Errors
+
+Make sure you have the required type definitions installed:
+
+```bash
+npm install --save-dev @types/react @types/react-dom
 ```
 
-## Version Management
+## 🤝 Contributing
 
-- **Patch** (1.0.0 → 1.0.1): Bug fixes
-- **Minor** (1.0.0 → 1.1.0): New features, backward compatible
-- **Major** (1.0.0 → 2.0.0): Breaking changes
+Contributions are welcome! Please open an issue or submit a pull request.
 
-```bash
-npm version patch
-npm version minor
-npm version major
-```
+## 📄 License
 
-## Important Notes
+MIT © Swiftment Team
 
-1. **SDK Dependencies**: You need to extract your `sdk` and `getProgram` functions into this package or make them importable.
+## 🔗 Links
 
-2. **Scoped Package**: The `@swiftment/` prefix means you need to publish with `--access public`.
+- [GitHub Repository](https://github.com/yourusername/swiftment-button)
+- [Documentation](https://docs.swiftment.io)
+- [Issue Tracker](https://github.com/yourusername/swiftment-button/issues)
 
-3. **Testing**: Always test your package locally with `npm link` before publishing.
+## 💬 Support
 
-4. **Versioning**: Follow semantic versioning (semver).
-
-5. **Documentation**: Keep your README updated with examples and API documentation.
-
-## Next Steps
-
-1. Set up your GitHub repository
-2. Add CI/CD for automated publishing
-3. Create example projects
-4. Add unit tests
-5. Set up a documentation website
-
-## Support
-
-For issues and questions, please open an issue on GitHub.
+For questions and support:
+- Open an issue on [GitHub](https://github.com/yourusername/swiftment-button/issues)
+- Join our [Discord community](https://discord.gg/swiftment)
+- Email: bristin.borah.7@gmail.com

@@ -1,0 +1,1073 @@
+{
+    "address": "6SsNGoMWPnU18ax2MqCtfaQuTY8MgehYUt52bsrNc84k",
+    "metadata": {
+        "name": "swiftment_program",
+        "version": "0.1.0",
+        "spec": "0.1.0",
+        "description": "Created with Anchor"
+    },
+    "instructions": [
+        {
+            "name": "initialize",
+            "discriminator": [
+                175,
+                175,
+                109,
+                31,
+                13,
+                152,
+                155,
+                237
+            ],
+            "accounts": [
+                {
+                    "name": "config",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    99,
+                                    111,
+                                    110,
+                                    102,
+                                    105,
+                                    103
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "usdc_mint"
+                },
+                {
+                    "name": "authority_treasury",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "account",
+                                "path": "authority"
+                            },
+                            {
+                                "kind": "const",
+                                "value": [
+                                    6,
+                                    221,
+                                    246,
+                                    225,
+                                    215,
+                                    101,
+                                    161,
+                                    147,
+                                    217,
+                                    203,
+                                    225,
+                                    70,
+                                    206,
+                                    235,
+                                    121,
+                                    172,
+                                    28,
+                                    180,
+                                    133,
+                                    237,
+                                    95,
+                                    91,
+                                    55,
+                                    145,
+                                    58,
+                                    140,
+                                    245,
+                                    133,
+                                    126,
+                                    255,
+                                    0,
+                                    169
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "usdc_mint"
+                            }
+                        ],
+                        "program": {
+                            "kind": "const",
+                            "value": [
+                                140,
+                                151,
+                                37,
+                                143,
+                                78,
+                                36,
+                                137,
+                                241,
+                                187,
+                                61,
+                                16,
+                                41,
+                                20,
+                                142,
+                                13,
+                                131,
+                                11,
+                                90,
+                                19,
+                                153,
+                                218,
+                                255,
+                                16,
+                                132,
+                                4,
+                                142,
+                                123,
+                                216,
+                                219,
+                                233,
+                                248,
+                                89
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "associated_token_program",
+                    "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+                },
+                {
+                    "name": "authority",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "token_program",
+                    "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                }
+            ],
+            "args": [
+                {
+                    "name": "usdc_mint",
+                    "type": "pubkey"
+                },
+                {
+                    "name": "purchase_fee_bps",
+                    "type": "u16"
+                },
+                {
+                    "name": "withdraw_fee_bps",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "opt_in",
+            "discriminator": [
+                80,
+                60,
+                147,
+                52,
+                129,
+                219,
+                85,
+                82
+            ],
+            "accounts": [
+                {
+                    "name": "config"
+                },
+                {
+                    "name": "user"
+                },
+                {
+                    "name": "merchant"
+                },
+                {
+                    "name": "user_platform",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    117,
+                                    115,
+                                    101,
+                                    114,
+                                    95,
+                                    112,
+                                    108,
+                                    97,
+                                    116,
+                                    102,
+                                    111,
+                                    114,
+                                    109
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "user"
+                            },
+                            {
+                                "kind": "account",
+                                "path": "merchant"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "user_authority",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                }
+            ],
+            "args": [
+                {
+                    "name": "daily_limit_usdc",
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "pay",
+            "discriminator": [
+                119,
+                18,
+                216,
+                65,
+                192,
+                117,
+                122,
+                220
+            ],
+            "accounts": [
+                {
+                    "name": "config"
+                },
+                {
+                    "name": "user"
+                },
+                {
+                    "name": "merchant"
+                },
+                {
+                    "name": "user_platform",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    117,
+                                    115,
+                                    101,
+                                    114,
+                                    95,
+                                    112,
+                                    108,
+                                    97,
+                                    116,
+                                    102,
+                                    111,
+                                    114,
+                                    109
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "user"
+                            },
+                            {
+                                "kind": "account",
+                                "path": "merchant"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "usdc_mint"
+                },
+                {
+                    "name": "user_usdc_ata",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "account",
+                                "path": "user_authority"
+                            },
+                            {
+                                "kind": "const",
+                                "value": [
+                                    6,
+                                    221,
+                                    246,
+                                    225,
+                                    215,
+                                    101,
+                                    161,
+                                    147,
+                                    217,
+                                    203,
+                                    225,
+                                    70,
+                                    206,
+                                    235,
+                                    121,
+                                    172,
+                                    28,
+                                    180,
+                                    133,
+                                    237,
+                                    95,
+                                    91,
+                                    55,
+                                    145,
+                                    58,
+                                    140,
+                                    245,
+                                    133,
+                                    126,
+                                    255,
+                                    0,
+                                    169
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "usdc_mint"
+                            }
+                        ],
+                        "program": {
+                            "kind": "const",
+                            "value": [
+                                140,
+                                151,
+                                37,
+                                143,
+                                78,
+                                36,
+                                137,
+                                241,
+                                187,
+                                61,
+                                16,
+                                41,
+                                20,
+                                142,
+                                13,
+                                131,
+                                11,
+                                90,
+                                19,
+                                153,
+                                218,
+                                255,
+                                16,
+                                132,
+                                4,
+                                142,
+                                123,
+                                216,
+                                219,
+                                233,
+                                248,
+                                89
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "treasury",
+                    "writable": true
+                },
+                {
+                    "name": "treasury_usdc_ata",
+                    "writable": true
+                },
+                {
+                    "name": "authority_treasury",
+                    "writable": true
+                },
+                {
+                    "name": "user_authority",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "associated_token_program",
+                    "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+                },
+                {
+                    "name": "token_program",
+                    "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                }
+            ],
+            "args": [
+                {
+                    "name": "amount_usdc",
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "register_merchant",
+            "discriminator": [
+                238,
+                245,
+                77,
+                132,
+                161,
+                88,
+                216,
+                248
+            ],
+            "accounts": [
+                {
+                    "name": "config",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    99,
+                                    111,
+                                    110,
+                                    102,
+                                    105,
+                                    103
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "merchant",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    109,
+                                    101,
+                                    114,
+                                    99,
+                                    104,
+                                    97,
+                                    110,
+                                    116
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "merchant_authority"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "treasury",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    116,
+                                    114,
+                                    101,
+                                    97,
+                                    115,
+                                    117,
+                                    114,
+                                    121
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "merchant"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "treasury_usdc_ata",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "account",
+                                "path": "treasury"
+                            },
+                            {
+                                "kind": "const",
+                                "value": [
+                                    6,
+                                    221,
+                                    246,
+                                    225,
+                                    215,
+                                    101,
+                                    161,
+                                    147,
+                                    217,
+                                    203,
+                                    225,
+                                    70,
+                                    206,
+                                    235,
+                                    121,
+                                    172,
+                                    28,
+                                    180,
+                                    133,
+                                    237,
+                                    95,
+                                    91,
+                                    55,
+                                    145,
+                                    58,
+                                    140,
+                                    245,
+                                    133,
+                                    126,
+                                    255,
+                                    0,
+                                    169
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "usdc_mint"
+                            }
+                        ],
+                        "program": {
+                            "kind": "const",
+                            "value": [
+                                140,
+                                151,
+                                37,
+                                143,
+                                78,
+                                36,
+                                137,
+                                241,
+                                187,
+                                61,
+                                16,
+                                41,
+                                20,
+                                142,
+                                13,
+                                131,
+                                11,
+                                90,
+                                19,
+                                153,
+                                218,
+                                255,
+                                16,
+                                132,
+                                4,
+                                142,
+                                123,
+                                216,
+                                219,
+                                233,
+                                248,
+                                89
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "usdc_mint"
+                },
+                {
+                    "name": "merchant_authority",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "associated_token_program",
+                    "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+                },
+                {
+                    "name": "token_program",
+                    "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                }
+            ],
+            "args": []
+        },
+        {
+            "name": "register_user",
+            "discriminator": [
+                2,
+                241,
+                150,
+                223,
+                99,
+                214,
+                116,
+                97
+            ],
+            "accounts": [
+                {
+                    "name": "user",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    117,
+                                    115,
+                                    101,
+                                    114
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "user_authority"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "user_authority",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                }
+            ],
+            "args": []
+        },
+        {
+            "name": "set_daily_limit",
+            "discriminator": [
+                0,
+                229,
+                100,
+                68,
+                254,
+                3,
+                185,
+                75
+            ],
+            "accounts": [
+                {
+                    "name": "user"
+                },
+                {
+                    "name": "user_platform",
+                    "writable": true
+                },
+                {
+                    "name": "user_authority",
+                    "signer": true
+                }
+            ],
+            "args": [
+                {
+                    "name": "new_limit",
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "withdraw",
+            "discriminator": [
+                183,
+                18,
+                70,
+                156,
+                148,
+                109,
+                161,
+                34
+            ],
+            "accounts": [
+                {
+                    "name": "config"
+                },
+                {
+                    "name": "merchant"
+                },
+                {
+                    "name": "treasury",
+                    "writable": true
+                },
+                {
+                    "name": "treasury_usdc_ata",
+                    "writable": true
+                },
+                {
+                    "name": "merchant_usdc_ata",
+                    "writable": true
+                },
+                {
+                    "name": "authority_treasury",
+                    "docs": [
+                        "CHECK"
+                    ],
+                    "writable": true
+                },
+                {
+                    "name": "merchant_authority",
+                    "signer": true,
+                    "relations": [
+                        "merchant"
+                    ]
+                },
+                {
+                    "name": "token_program",
+                    "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+                }
+            ],
+            "args": [
+                {
+                    "name": "amount_usdc",
+                    "type": "u64"
+                }
+            ]
+        }
+    ],
+    "accounts": [
+        {
+            "name": "Config",
+            "discriminator": [
+                155,
+                12,
+                170,
+                224,
+                30,
+                250,
+                204,
+                130
+            ]
+        },
+        {
+            "name": "Merchant",
+            "discriminator": [
+                71,
+                235,
+                30,
+                40,
+                231,
+                21,
+                32,
+                64
+            ]
+        },
+        {
+            "name": "Treasury",
+            "discriminator": [
+                238,
+                239,
+                123,
+                238,
+                89,
+                1,
+                168,
+                253
+            ]
+        },
+        {
+            "name": "User",
+            "discriminator": [
+                159,
+                117,
+                95,
+                227,
+                239,
+                151,
+                58,
+                236
+            ]
+        },
+        {
+            "name": "UserPlatform",
+            "discriminator": [
+                25,
+                161,
+                147,
+                135,
+                103,
+                48,
+                148,
+                17
+            ]
+        }
+    ],
+    "events": [
+        {
+            "name": "PurchaseEvent",
+            "discriminator": [
+                229,
+                118,
+                246,
+                164,
+                59,
+                65,
+                116,
+                254
+            ]
+        },
+        {
+            "name": "WithdrawEvent",
+            "discriminator": [
+                22,
+                9,
+                133,
+                26,
+                160,
+                44,
+                71,
+                192
+            ]
+        }
+    ],
+    "errors": [
+        {
+            "code": 6000,
+            "name": "InvalidBps",
+            "msg": "Invalid basis points"
+        },
+        {
+            "code": 6001,
+            "name": "DailyLimitExceeded",
+            "msg": "Daily spending limit exceeded"
+        },
+        {
+            "code": 6002,
+            "name": "InvalidTreasuryAta",
+            "msg": "Treasury ATA does not match treasury + USDC mint"
+        },
+        {
+            "code": 6003,
+            "name": "InvalidFeeAta",
+            "msg": "Invalid fee ata"
+        },
+        {
+            "code": 6004,
+            "name": "InvalidFeeOwner",
+            "msg": "Invalid fee owner"
+        },
+        {
+            "code": 6005,
+            "name": "InvalidUserAtaOwner",
+            "msg": "Invalid user ata owner"
+        },
+        {
+            "code": 6006,
+            "name": "InvalidUserAtaMint",
+            "msg": "Invalid user ata mint"
+        },
+        {
+            "code": 6007,
+            "name": "InvalidFeeAtaMint",
+            "msg": "Invalid fee ata mint"
+        }
+    ],
+    "types": [
+        {
+            "name": "Config",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "authority",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "usdc_mint",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "purchase_fee_bps",
+                        "type": "u16"
+                    },
+                    {
+                        "name": "withdraw_fee_bps",
+                        "type": "u16"
+                    },
+                    {
+                        "name": "authority_treasury",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "bump",
+                        "type": "u8"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Merchant",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "merchant_authority",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "treasury",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "bump",
+                        "type": "u8"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "PurchaseEvent",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "user",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "merchant",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "amount_usdc",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "fee_usdc",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "ts",
+                        "type": "i64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Treasury",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "merchant",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "usdc_ata",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "bump",
+                        "type": "u8"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "User",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "owner",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "default_daily_limit_usdc",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "bump",
+                        "type": "u8"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UserPlatform",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "user",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "merchant",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "daily_limit_usdc",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "spent_today_usdc",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "last_reset_unix",
+                        "type": "i64"
+                    },
+                    {
+                        "name": "bump",
+                        "type": "u8"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "WithdrawEvent",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "merchant",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "amount_usdc",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "fee_usdc",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "ts",
+                        "type": "i64"
+                    }
+                ]
+            }
+        }
+    ]
+}

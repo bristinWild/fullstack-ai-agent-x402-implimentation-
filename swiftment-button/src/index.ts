@@ -1,2 +1,2 @@
-export { SwiftmentPayButton, type SwiftmentPayButtonProps } from './SwiftmentPayButton';
-export default SwiftmentPayButton;
+export { SwiftmentPayButton } from './components/PayButton';
+export type { SwiftmentPayButtonProps } from './types';
