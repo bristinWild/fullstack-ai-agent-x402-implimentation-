@@ -1,6 +1,6 @@
 {
     "name": "@swiftment/pay-button",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "A React component and a easy to use tool for businesses to fascilitate Solana payments that utilise x402 over any platform.",
     "main": "./dist/index.js",
     "module": "./dist/index.mjs",
